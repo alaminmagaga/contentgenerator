@@ -1,0 +1,10 @@
+
+
+
+  <h1>Generate Content</h1>
+  <form method="post">
+    {% csrf_token %}
+    <label for="prompt">Enter a prompt:</label><br>
+    <textarea name="prompt" rows="4" cols="50"></textarea><br>
+    <input type="submit" value="Generate">
+  </form>
