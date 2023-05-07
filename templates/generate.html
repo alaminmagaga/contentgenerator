@@ -1,10 +1,44 @@
-
-
-
-  <h1>Generate Content</h1>
-  <form method="post">
-    {% csrf_token %}
-    <label for="prompt">Enter a prompt:</label><br>
-    <textarea name="prompt" rows="4" cols="50"></textarea><br>
-    <input type="submit" value="Generate">
-  </form>
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My Page</title>
+    <style>
+      h1 {
+        color: blue;
+        font-size: 28px;
+      }
+      
+      label {
+        font-size: 18px;
+      }
+      
+      textarea {
+        width: 100%;
+        height: 200px;
+        border-radius: 5px;
+        border: 1px solid gray;
+        padding: 10px;
+        font-size: 16px;
+      }
+      
+      input[type="submit"] {
+        background-color: blue;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 18px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Multilingual Content Generator Web APP</h1>
+    <form method="post">
+      {% csrf_token %}
+      <label for="prompt">Enter a prompt:</label><br>
+      <textarea name="prompt" rows="4" cols="50"></textarea><br>
+      <input type="submit" value="Generate">
+    </form>
+  </body>
+</html>
