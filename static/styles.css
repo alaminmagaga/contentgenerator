@@ -1,0 +1,124 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2;
+  }
+
+  .container {
+    width: 90%;
+    position: relative;
+    padding: 20px;
+    display: flex;
+  }
+
+  .parameter-container {
+    width: 20%;
+    padding: 10px;
+    background-color: #fff;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    margin-right: 10px;
+    overflow: auto;
+  }
+
+  .content-container {
+    width: 80%;
+  }
+
+  h1 {
+    color: #333;
+    font-size: 28px;
+    text-align: center;
+  }
+
+  label {
+    font-size: 18px;
+    color: #333;
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  input[type="text"],
+  input[type="number"] {
+    width: 90%;
+    height: 20px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  input[type="submit"] {
+    background-color: teal;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+  }
+
+  .result-container {
+    flex-grow: 1;
+    margin-top: 20px;
+    width: 90%;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    padding: 10px;
+    white-space: pre-wrap;
+    position: relative;
+  }
+
+  .copy-icon {
+    font-size: 20px;
+    color: #333;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .copy-icon:hover {
+    opacity: 0.7;
+  }
+
+  .copy-icon.copied::before {
+    content: "Copied!";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #007bff;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 3px;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .copy-icon.copied.clicked::before {
+    opacity: 1;
+  }
+
+  /* Added CSS for download buttons */
+  .download-buttons {
+    margin-top: 10px;
+  }
+
+  .download-buttons button {
+    background-color: teal;
+    color: #fff;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-right: 5px;
+  }
+
+  .download-buttons button:hover {
+    opacity: 0.7;
+  }

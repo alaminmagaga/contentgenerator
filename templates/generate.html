@@ -1,44 +1,162 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
   <head>
-    <title>My Page</title>
-    <style>
-      h1 {
-        color: blue;
-        font-size: 28px;
+    <title>Content Generation</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.js"></script>
+    <script>
+      $(document).ready(function() {
+        $('form').on('submit', function(event) {
+          event.preventDefault();
+          var prompt = $('input[name="prompt"]').val();
+          var maxTokens = parseInt($('input[name="max_tokens"]').val());
+          var temperature = parseFloat($('input[name="temperature"]').val());
+          var k = parseInt($('input[name="k"]').val());
+          var stopSequences = $('input[name="stop_sequences"]').val().split(',');
+
+          generateContent(prompt, maxTokens, temperature, k, stopSequences);
+        });
+
+        $('#download-words').on('click', function() {
+          downloadContent('words');
+        });
+
+        $('#download-docs').on('click', function() {
+          downloadContent('docs');
+        });
+
+        $('#download-pdf').on('click', function() {
+          downloadContent('pdf');
+        });
+      });
+
+      function generateContent(prompt, maxTokens, temperature, k, stopSequences) {
+        $.ajax({
+          type: 'POST',
+          url: '{% url "generate" %}',
+          data: {
+            'prompt': prompt,
+            'max_tokens': maxTokens,
+            'temperature': temperature,
+            'k': k,
+            'stop_sequences': stopSequences.join(','),
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+          },
+          beforeSend: function() {
+            $('#result').html('Generating content...');
+            $('.copy-icon').css('opacity', 0);
+          },
+          success: function(response) {
+            var content = response.content;
+            animateText(content, 0);
+            showCopyIcon();
+          },
+          error: function(xhr, errmsg, err) {
+            console.log(errmsg);
+          }
+        });
       }
-      
-      label {
-        font-size: 18px;
+
+      function animateText(text, index) {
+        if (index < text.length) {
+          $('#result').append(text[index]);
+          index++;
+          setTimeout(function() {
+            animateText(text, index);
+          }, 10);
+        }
       }
-      
-      textarea {
-        width: 100%;
-        height: 200px;
-        border-radius: 5px;
-        border: 1px solid gray;
-        padding: 10px;
-        font-size: 16px;
+
+      function showCopyIcon() {
+        $('.copy-icon').css('opacity', 1);
       }
-      
-      input[type="submit"] {
-        background-color: blue;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        font-size: 18px;
-        cursor: pointer;
+
+      function copyContent() {
+        var text = $('#result').text().trim();
+        var tempInput = $('<input>');
+        $('body').append(tempInput);
+        tempInput.val(text).select();
+        document.execCommand('copy');
+        tempInput.remove();
+        $('.copy-icon').addClass('copied clicked');
+        setTimeout(function() {
+          $('.copy-icon').removeClass('clicked');
+        }, 500);
       }
-    </style>
+
+      function downloadContent(format) {
+        var text = $('#result').text().trim();
+        var fileName = 'generated_content';
+
+        if (format === 'words') {
+          downloadTextFile(text, fileName + '.doc', 'application/msword');
+        } else if (format === 'docs') {
+          downloadTextFile(text, fileName + '.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+        } else if (format === 'pdf') {
+          var element = document.getElementById('result');
+          html2pdf().from(element).save(fileName + '.pdf');
+        }
+      }
+
+      function downloadTextFile(content, fileName, contentType) {
+        var blob = new Blob([content], { type: contentType });
+
+        if (navigator.msSaveBlob) {
+          navigator.msSaveBlob(blob, fileName);
+        } else {
+          var link = document.createElement('a');
+          if (link.download !== undefined) {
+            var url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', fileName);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }
+        }
+      }
+    </script>
+    <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}">
+    
   </head>
   <body>
-    <h1>Multilingual Content Generator Web APP</h1>
-    <form method="post">
-      {% csrf_token %}
-      <label for="prompt">Enter a prompt:</label><br>
-      <textarea name="prompt" rows="4" cols="50"></textarea><br>
-      <input type="submit" value="Generate">
-    </form>
+    <h1>Content Generation</h1>
+    <div class="container">
+      <div class="content-container">
+        <form method="post">
+          {% csrf_token %}
+          <label for="prompt">Enter a prompt:</label>
+          <input type="text" name="prompt" autocomplete="off">
+          <br>
+          <input type="submit" value="Generate">
+        </form>
+        <div class="result-container">
+          <div id="result"></div>
+          <span class="copy-icon" onclick="copyContent()" title="Copy to Clipboard">&#128203;</span>
+      
+        </div>
+        <div class="download-buttons">
+          <button id="download-words">Download as .doc</button>
+          <button id="download-docs">Download as .docx</button>
+          <button id="download-pdf">Download as .pdf</button>
+        </div>
+      </div>
+
+      <div class="parameter-container">
+        <label for="max_tokens">Max Tokens:</label>
+        <input type="number" name="max_tokens" value="300">
+        <label for="temperature">Temperature:</label>
+        <input type="number" name="temperature" value="0.9">
+        <label for="k">K:</label>
+        <input type="number" name="k" value="0">
+        <label for="stop_sequences">Stop Sequences:</label>
+        <input type="text" name="stop_sequences" placeholder="Comma-separated values">
+      </div>
+    </div>
+
+    
+  
   </body>
 </html>
